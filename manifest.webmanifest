@@ -1,0 +1,24 @@
+{
+  "name": "Quick Sets",
+  "short_name": "Quick Sets",
+  "description": "Pick a length and a style, then get a guided workout.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0f1e",
+  "theme_color": "#6a8cff",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
