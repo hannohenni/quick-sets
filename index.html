@@ -67,9 +67,9 @@ h1{font-size:34px;line-height:1.1;margin:18px 4px 6px;letter-spacing:-.02em}
 h2{text-align:center;font-size:30px;margin:2px 0 12px;letter-spacing:-.02em;line-height:1.15}
 .fig{flex:1;min-height:150px;display:grid;place-items:center;padding:8px}
 .fig svg{width:100%;height:100%}
-.fig svg polyline{fill:none;stroke:var(--ink);stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
-.fig svg circle{fill:none;stroke:var(--ink);stroke-width:6}
-.fig .bk{opacity:.35}.fig .ar{stroke:var(--a)}.fig .gr{stroke:var(--ink2);stroke-width:3;stroke-linecap:round;opacity:.5}
+.fig svg polyline{fill:none;stroke:var(--ink);stroke-width:8;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.fig svg circle{fill:none;stroke:var(--ink);stroke-width:7;vector-effect:non-scaling-stroke}
+.fig .bk{opacity:.35}.fig .ar{stroke:var(--a)}.fig .gr{stroke:var(--ink2);stroke-width:3;stroke-linecap:round;opacity:.5;vector-effect:non-scaling-stroke}
 .cue{text-align:center;color:var(--ink2);margin:12px 8px 8px;min-height:44px;font-size:16px}
 .ringw{position:relative;width:120px;height:120px;margin:0 auto;flex:none}
 .ringw svg{width:100%;height:100%;transform:rotate(-90deg)}
@@ -78,6 +78,7 @@ h2{text-align:center;font-size:30px;margin:2px 0 12px;letter-spacing:-.02em;line
 .ctl{display:flex;justify-content:center;align-items:center;gap:22px;margin-top:14px;flex:none}
 .ctl .glass{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;cursor:pointer;padding:0;transition:transform .15s}
 .ctl .big{width:76px;height:76px;background:linear-gradient(135deg,var(--a),var(--b));color:#fff}
+.ts.glass{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;z-index:3;padding:9px 14px;border-radius:16px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .3s}.ts.on{opacity:1}
 .ov{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:24px;background:rgba(0,0,0,.28);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:fi .25s ease}
 .dlg{width:100%;max-width:340px;padding:26px 22px 22px;text-align:center}
 .dlg.glass{background:color-mix(in srgb,var(--bg) 78%,transparent)}
@@ -129,17 +130,23 @@ const E=[
 const D=(a,l)=>[Math.sin(a*R)*l,Math.cos(a*R)*l],ad=(p,q)=>[p[0]+q[0],p[1]+q[1]];
 function fk(p){const[t,a1,a2,l1,l2,m1,m2,f]=p,H=[0,0],S=ad(H,D(t,46)),hd=ad(S,D(t,13)),E=ad(S,D(a1,27)),W=ad(E,D(a2,25)),K=ad(H,D(l1,42)),A=ad(K,D(l2,42)),T=ad(A,D(f,11)),K2=ad(H,D(m1,42)),A2=ad(K2,D(m2,42)),T2=ad(A2,D(f,11));return{H,S,hd,E,W,K,A,T,K2,A2,T2}}
 const lp=(a,b,k)=>a.map((v,i)=>v+(((b[i]-v+540)%360)-180)*k);
+function pz(ex,u){const P=ex.p,n=P.length,i=Math.floor(u)%n,f=u%1,k=f*f*(3-2*f),J=fk(lp(P[i],P[(i+1)%n],k)),ox=(ex.o||0)-J[ex.a][0],oy=127-Math.max(...Object.entries(J).map(([q,v])=>v[1]+(q=='hd'?5:0)));return{J,ox,oy}}
 function fig(ex,u){
- if(ex.o==null){let lo=1e9,hi=-1e9;ex.p.forEach(p=>{const J=fk(p),ax=J[ex.a][0];for(const q in J){const x=J[q][0]-ax;lo=Math.min(lo,x-(q=='hd'?9:0));hi=Math.max(hi,x+(q=='hd'?9:0))}});ex.o=110-(lo+hi)/2}
- const P=ex.p,n=P.length,i=Math.floor(u)%n,f=u%1,k=f*f*(3-2*f),J=fk(lp(P[i],P[(i+1)%n],k)),ox=ex.o-J[ex.a][0];
- const oy=127-Math.max(...Object.entries(J).map(([q,v])=>v[1]+(q=='hd'?5:0)));
- const g=a=>a.map(v=>(v[0]+ox).toFixed(1)+','+(v[1]+oy).toFixed(1)).join(' ');
- return `<line class="gr" x1="18" y1="132" x2="202" y2="132"/><polyline class="bk" points="${g([J.H,J.K2,J.A2,J.T2])}"/><polyline points="${g([J.H,J.K,J.A,J.T])}"/><polyline points="${g([J.H,J.S])}"/><circle cx="${(J.hd[0]+ox).toFixed(1)}" cy="${(J.hd[1]+oy).toFixed(1)}" r="9"/><polyline class="ar" points="${g([J.S,J.E,J.W])}"/>`}
+ if(ex.vb==null){let lo=1e9,hi=-1e9,mn=1e9,mx=134;const n=ex.p.length;
+  for(let t=0;t<n;t+=.1){const{J,oy}=pz(ex,t),ax=J[ex.a][0];for(const q in J){const x=J[q][0]-ax,y=J[q][1]+oy,r=q=='hd'?9:0;lo=Math.min(lo,x-r);hi=Math.max(hi,x+r);mn=Math.min(mn,y-r);mx=Math.max(mx,y+r)}}
+  ex.o=110-(lo+hi)/2;const w=Math.max(hi-lo+40,150),hh=Math.max(mx-mn+40,110);ex.vb=[110-w/2,(mn+mx)/2-hh/2,w,hh]}
+ const{J,ox,oy}=pz(ex,u),V=ex.vb,g=a=>a.map(v=>(v[0]+ox).toFixed(1)+','+(v[1]+oy).toFixed(1)).join(' ');
+ return `<line class="gr" x1="${V[0]+8}" y1="132" x2="${V[0]+V[2]-8}" y2="132"/><polyline class="bk" points="${g([J.H,J.K2,J.A2,J.T2])}"/><polyline points="${g([J.H,J.K,J.A,J.T])}"/><polyline points="${g([J.H,J.S])}"/><circle cx="${(J.hd[0]+ox).toFixed(1)}" cy="${(J.hd[1]+oy).toFixed(1)}" r="9"/><polyline class="ar" points="${g([J.S,J.E,J.W])}"/>`}
 
 let S={step:'dur'},fc=0,ac;
 const sh=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
 const col=c=>{document.documentElement.style.setProperty('--a',c[0]);document.documentElement.style.setProperty('--b',c[1])};
-function bp(f=880,d=.12){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch{}}
+let SN=0;try{SN=+localStorage.getItem('qs-sn')||0}catch{}
+const SND={go:[[880,.14],[1175,.3]],rest:[[660,.16],[440,.34]],tick:[[800,.09]],done:[[784,.14],[988,.14],[1319,.45]]};
+function au(){try{if(navigator.audioSession)navigator.audioSession.type=SN?'transient':'playback'}catch{}try{ac=ac||new AudioContext();if(ac.state!='running')ac.resume()}catch{}}
+function bp(k){if(SN==2)return;au();if(!ac)return;try{let t=ac.currentTime+.03;for(const[f,d]of SND[k]){const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.45,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d+.03);t+=d+.07}}catch{}}
+const rel=()=>{try{ac&&ac.suspend()}catch{}};
+const SP='<path d="M11 5L6 9H3v6h3l5 4z"/>',SI=[I(SP+'<path d="M15.5 8.5a5 5 0 010 7"/><path d="M18.5 5.5a9 9 0 010 13"/>',1,22),I(SP+'<path d="M15.5 8.5a5 5 0 010 7"/>',1,22),I(SP+'<path d="M16 9l5 6M21 9l-5 6"/>',1,22)];
 const vib=()=>{try{navigator.vibrate&&navigator.vibrate(60)}catch{}};
 async function lock(){try{S.wl=await navigator.wakeLock.request('screen')}catch{}}
 const unlock=()=>{try{S.wl&&S.wl.release()}catch{}};
@@ -152,34 +159,35 @@ dur:()=>pick('How long?','Pick your workout length.',Object.entries(DU).map(([k,
 type:()=>pick('What today?','Choose your style.',[['strength','Strength','Build muscle'],['cardio','Cardio','Get your heart pumping'],['yoga','Yoga','Stretch and breathe']],'type',1),
 sub:()=>pick('Which focus?','Choose a body area.',[['upper','Upper body','Arms, chest, core'],['lower','Lower body','Legs and glutes'],['full','Full body','Everything']],'sub',1),
 ready:()=>`<div class="scr"><div class="top"><button class="glass ib" data-a="back">${BK}</button></div><h1>Ready?</h1><p class="s">${lab()}</p><div class="glass sum"><div><b>${DU[S.dur][2]}</b><span>exercises</span></div><div><b>${mins()}</b><span>minutes</span></div><div><b>${TM[S.type][0]}s</b><span>on · ${TM[S.type][1]}s off</span></div></div><div style="flex:1"></div><button class="go" data-a="start">Start</button></div>`,
-run(){const x=S.seq[S.i],r=S.ph=='r';return `<div class="scr"><div class="top"><button class="glass ib" data-a="close">${X}</button><div class="cnt">${S.i+1} / ${S.seq.length}</div><div style="width:44px"></div></div><div class="bar"><i id="pb"></i></div><div class="lbl">${r?(S.i?'Rest · up next':'Get ready'):'Go'}</div><h2>${x.n}</h2><div class="glass fig"><svg id="fg" viewBox="0 0 220 150"></svg></div><p class="cue">${x.c}</p><div class="ringw"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" stroke="rgba(127,127,127,.25)"/><circle id="rg" cx="60" cy="60" r="52" stroke="var(--a)" stroke-dasharray="326.7"/></svg><div id="tn"></div></div><div class="ctl"><button class="glass" data-a="prev">${I('<path d="M18 6l-9 6 9 6zM7 6H5v12h2z"/>')}</button><button class="glass big" data-a="pp">${S.pz?I('<path d="M8 5v14l11-7z"/>',0,30):I('<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>',0,30)}</button><button class="glass" data-a="next">${I('<path d="M6 6l9 6-9 6zM17 6h2v12h-2z"/>')}</button></div></div>${S.cf?`<div class="ov"><div class="glass dlg"><h3>End workout?</h3><p>Your progress will be lost.</p><button class="go" data-a="stay">Keep going</button><button class="glass opt" data-a="end"><b style="font-size:17px">End workout</b></button></div></div>`:''}`},
+run(){const x=S.seq[S.i],r=S.ph=='r';return `<div class="scr"><div class="top"><button class="glass ib" data-a="close">${X}</button><div class="cnt">${S.i+1} / ${S.seq.length}</div><button class="glass ib" data-a="snd">${SI[SN]}</button></div><div id="ts" class="glass ts"></div><div class="bar"><i id="pb"></i></div><div class="lbl">${r?(S.i?'Rest · up next':'Get ready'):'Go'}</div><h2>${x.n}</h2><div class="glass fig"><svg id="fg" viewBox="0 0 220 150"></svg></div><p class="cue">${x.c}</p><div class="ringw"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" stroke="rgba(127,127,127,.25)"/><circle id="rg" cx="60" cy="60" r="52" stroke="var(--a)" stroke-dasharray="326.7"/></svg><div id="tn"></div></div><div class="ctl"><button class="glass" data-a="prev">${I('<path d="M18 6l-9 6 9 6zM7 6H5v12h2z"/>')}</button><button class="glass big" data-a="pp">${S.pz?I('<path d="M8 5v14l11-7z"/>',0,30):I('<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>',0,30)}</button><button class="glass" data-a="next">${I('<path d="M6 6l9 6-9 6zM17 6h2v12h-2z"/>')}</button></div></div>${S.cf?`<div class="ov"><div class="glass dlg"><h3>End workout?</h3><p>Your progress will be lost.</p><button class="go" data-a="stay">Keep going</button><button class="glass opt" data-a="end"><b style="font-size:17px">End workout</b></button></div></div>`:''}`},
 done:()=>`<div class="scr" style="justify-content:center;text-align:center"><h1>Nice work!</h1><p class="s">${DU[S.dur][2]} exercises · ${lab()}</p><button class="go" data-a="again">Go again</button><button class="glass opt" style="flex:none;height:64px;margin-top:12px;justify-content:center;border-radius:32px" data-a="home"><b style="font-size:18px">New workout</b></button></div>`
 };
 function render(){app.innerHTML=V[S.step]();ui()}
 function ui(){if(S.step!='run')return;const t=$('#tn');if(!t)return;t.textContent=Math.max(0,Math.ceil(S.left/1000));$('#rg').style.strokeDashoffset=326.7*(1-Math.max(0,S.left)/S.tot);$('#pb').style.width=((S.i+(S.ph=='w'?1-Math.max(0,S.left)/S.tot:0))/S.seq.length*100)+'%'}
-function adv(){const T=TM[S.type];if(S.ph=='r'){S.ph='w';S.tot=S.left=T[0]*1000;bp(1040,.25);vib()}else if(S.i>=S.seq.length-1){S.step='done';unlock();bp(784,.15);setTimeout(()=>bp(1047,.3),180);return}else{S.i++;fc=0;S.ph='r';S.tot=S.left=T[1]*1000;bp(520,.2)}S.t=Date.now()}
+function adv(){const T=TM[S.type];if(S.ph=='r'){S.ph='w';S.tot=S.left=T[0]*1000;bp('go');vib()}else if(S.i>=S.seq.length-1){S.step='done';unlock();bp('done');setTimeout(rel,1800);return}else{S.i++;fc=0;S.ph='r';S.tot=S.left=T[1]*1000;bp('rest')}S.t=Date.now()}
 const A={
 dur(v){S.dur=v;S.step='type'},
 type(v){S.type=v;col(CO[v]);S.step=v=='strength'?'sub':'ready'},
 sub(v){S.sub=v;S.step='ready'},
 back(){S.step=S.step=='ready'?(S.type=='strength'?'sub':'type'):S.step=='sub'?'type':'dur';if(S.step!='ready'&&S.step!='sub')col(C0)},
-start(){try{ac=ac||new AudioContext();ac.resume()}catch{}
+start(){au();
  const al=S.type=='cardio'?'k':S.type=='yoga'?'y':{upper:'u',lower:'l',full:'ulc'}[S.sub],pool=E.filter(x=>al.includes(x.g)),n=DU[S.dur][2];let q=[];
  while(q.length<n){let r=sh(pool);if(q.length&&r[0]==q[q.length-1])r.push(r.shift());q=q.concat(r)}
- S.seq=q.slice(0,n);S.i=0;S.ph='r';S.tot=S.left=5000;S.pz=false;S.t=Date.now();fc=0;S.step='run';lock()},
+ S.seq=q.slice(0,n);S.i=0;S.ph='r';S.tot=S.left=5000;S.pz=false;S.t=Date.now();fc=0;S.step='run';lock();bp('tick')},
 again(){A.start()},
-pp(){S.pz=!S.pz;S.t=Date.now()},
-next(){adv()},
-prev(){if(S.ph=='w'){S.ph='r'}else if(S.i>0){S.i--;fc=0}S.tot=S.left=3000;S.t=Date.now()},
+pp(){au();S.pz=!S.pz;S.t=Date.now()},
+next(){au();adv()},
+snd(){SN=(SN+1)%3;try{localStorage.setItem('qs-sn',SN)}catch{}if(SN<2)bp('go');S.ts=['Loud · plays even in silent mode','Mixes with your music','Sound off'][SN]},
+prev(){au();if(S.ph=='w'){S.ph='r'}else if(S.i>0){S.i--;fc=0}S.tot=S.left=3000;S.t=Date.now()},
 close(){S.cf=true;S.wp=S.pz;S.pz=true},
 stay(){S.cf=false;S.pz=S.wp;S.t=Date.now()},
-end(){S.cf=false;unlock();S.step='dur';col(C0)},
+end(){S.cf=false;unlock();rel();S.step='dur';col(C0)},
 home(){S.step='dur';col(C0)}
 };
-document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;A[b.dataset.a](b.dataset.v);render()});
-setInterval(()=>{if(S.step!='run'||S.pz)return;const n=Date.now(),d=n-S.t,o=Math.ceil(S.left/1000);S.t=n;S.left-=d;const s=Math.ceil(Math.max(S.left,0)/1000);if(s!=o&&s>0&&s<=3)bp(660,.1);if(S.left<=0){adv();render()}else ui()},100);
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;A[b.dataset.a](b.dataset.v);render();if(S.ts){const e=$('#ts');if(e){const f=$('.fig');if(f)e.style.top=(f.offsetTop+12)+'px';e.textContent=S.ts;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2200)}S.ts=''}});
+setInterval(()=>{if(S.step!='run'||S.pz)return;const n=Date.now(),d=n-S.t,o=Math.ceil(S.left/1000);S.t=n;S.left-=d;const s=Math.ceil(Math.max(S.left,0)/1000);if(s!=o&&s>0&&s<=3)bp('tick');if(S.left<=0){adv();render()}else ui()},100);
 let ft=0;
-function loop(t){const d=Math.min(t-ft,100);ft=t;if(S.step=='run'){if(!S.pz)fc+=d;const el=$('#fg');if(el)el.innerHTML=fig(S.seq[S.i],fc/1000)}requestAnimationFrame(loop)}
+function loop(t){const d=Math.min(t-ft,100);ft=t;if(S.step=='run'){if(!S.pz)fc+=d;const el=$('#fg');if(el){const ex=S.seq[S.i],s=fig(ex,fc/1000);el.setAttribute('viewBox',ex.vb.join(' '));el.innerHTML=s}}requestAnimationFrame(loop)}
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&S.step=='run'&&!S.pz){S.pz=true;render()}});
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 render();requestAnimationFrame(loop);
