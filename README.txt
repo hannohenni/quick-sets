@@ -9,4 +9,4 @@ Test locally: run `python3 -m http.server` in this folder and open http://localh
 
 Install: iPhone Safari > Share > Add to Home Screen. Android Chrome > menu > Install app.
 
-Updating: after editing any file, change the version in sw.js (const V = 'quick-sets-v2').
+Updating: after editing any file, change the version in sw.js (const V = 'quick-sets-v3').
