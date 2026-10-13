@@ -146,6 +146,7 @@ const SND={go:[[880,.14],[1175,.3]],rest:[[660,.16],[440,.34]],tick:[[800,.09]],
 function au(){try{if(navigator.audioSession)navigator.audioSession.type=SN?'transient':'playback'}catch{}try{ac=ac||new AudioContext();if(ac.state!='running')ac.resume()}catch{}}
 function bp(k){if(SN==2)return;au();if(!ac)return;try{let t=ac.currentTime+.03;for(const[f,d]of SND[k]){const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.45,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d+.03);t+=d+.07}}catch{}}
 const rel=()=>{try{ac&&ac.suspend()}catch{}};
+const SH=I('<path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11H5a1 1 0 00-1 1v8a1 1 0 001 1h14a1 1 0 001-1v-8a1 1 0 00-1-1h-1"/>',1,22);
 const SP='<path d="M11 5L6 9H3v6h3l5 4z"/>',SI=[I(SP+'<path d="M15.5 8.5a5 5 0 010 7"/><path d="M18.5 5.5a9 9 0 010 13"/>',1,22),I(SP+'<path d="M15.5 8.5a5 5 0 010 7"/>',1,22),I(SP+'<path d="M16 9l5 6M21 9l-5 6"/>',1,22)];
 const vib=()=>{try{navigator.vibrate&&navigator.vibrate(60)}catch{}};
 async function lock(){try{S.wl=await navigator.wakeLock.request('screen')}catch{}}
@@ -153,30 +154,53 @@ const unlock=()=>{try{S.wl&&S.wl.release()}catch{}};
 const lab=()=>DU[S.dur][0]+' · '+S.type[0].toUpperCase()+S.type.slice(1)+(S.type=='strength'?' · '+({upper:'Upper body',lower:'Lower body',full:'Full body'})[S.sub]:'');
 const mins=()=>Math.round((DU[S.dur][2]*60-TM[S.type][1]+5)/60);
 
+function mk(){const al=S.type=='cardio'?'k':S.type=='yoga'?'y':{upper:'u',lower:'l',full:'ulc'}[S.sub],pool=E.filter(x=>al.includes(x.g)),n=DU[S.dur][2];let q=[];while(q.length<n){let r=sh(pool);if(q.length&&r[0]==q[q.length-1])r.push(r.shift());q=q.concat(r)}S.seq=q.slice(0,n)}
 const pick=(t,s,it,a,b)=>`<div class="scr"><div class="top">${b?`<button class="glass ib" data-a="back">${BK}</button>`:''}</div><h1>${t}</h1><p class="s">${s}</p><div class="list">${it.map(([v,n,d])=>`<button class="glass opt" data-a="${a}" data-v="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div></div>`;
 const V={
 dur:()=>pick('How long?','Pick your workout length.',Object.entries(DU).map(([k,v])=>[k,v[0],v[1]]),'dur'),
 type:()=>pick('What today?','Choose your style.',[['strength','Strength','Build muscle'],['cardio','Cardio','Get your heart pumping'],['yoga','Yoga','Stretch and breathe']],'type',1),
 sub:()=>pick('Which focus?','Choose a body area.',[['upper','Upper body','Arms, chest, core'],['lower','Lower body','Legs and glutes'],['full','Full body','Everything']],'sub',1),
-ready:()=>`<div class="scr"><div class="top"><button class="glass ib" data-a="back">${BK}</button></div><h1>Ready?</h1><p class="s">${lab()}</p><div class="glass sum"><div><b>${DU[S.dur][2]}</b><span>exercises</span></div><div><b>${mins()}</b><span>minutes</span></div><div><b>${TM[S.type][0]}s</b><span>on · ${TM[S.type][1]}s off</span></div></div><div style="flex:1"></div><button class="go" data-a="start">Start</button></div>`,
+ready:()=>`<div class="scr"><div class="top"><button class="glass ib" data-a="back">${BK}</button><button class="glass ib" data-a="share" aria-label="Export to Apple Fitness">${SH}</button></div><div id="ts" class="glass ts"></div><h1>Ready?</h1><p class="s">${lab()}</p><div class="glass sum"><div><b>${DU[S.dur][2]}</b><span>exercises</span></div><div><b>${mins()}</b><span>minutes</span></div><div><b>${TM[S.type][0]}s</b><span>on · ${TM[S.type][1]}s off</span></div></div><div style="flex:1"></div><button class="go" data-a="start">Start</button></div>`,
 run(){const x=S.seq[S.i],r=S.ph=='r';return `<div class="scr"><div class="top"><button class="glass ib" data-a="close">${X}</button><div class="cnt">${S.i+1} / ${S.seq.length}</div><button class="glass ib" data-a="snd">${SI[SN]}</button></div><div id="ts" class="glass ts"></div><div class="bar"><i id="pb"></i></div><div class="lbl">${r?(S.i?'Rest · up next':'Get ready'):'Go'}</div><h2>${x.n}</h2><div class="glass fig"><svg id="fg" viewBox="0 0 220 150"></svg></div><p class="cue">${x.c}</p><div class="ringw"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" stroke="rgba(127,127,127,.25)"/><circle id="rg" cx="60" cy="60" r="52" stroke="var(--a)" stroke-dasharray="326.7"/></svg><div id="tn"></div></div><div class="ctl"><button class="glass" data-a="prev">${I('<path d="M18 6l-9 6 9 6zM7 6H5v12h2z"/>')}</button><button class="glass big" data-a="pp">${S.pz?I('<path d="M8 5v14l11-7z"/>',0,30):I('<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>',0,30)}</button><button class="glass" data-a="next">${I('<path d="M6 6l9 6-9 6zM17 6h2v12h-2z"/>')}</button></div></div>${S.cf?`<div class="ov"><div class="glass dlg"><h3>End workout?</h3><p>Your progress will be lost.</p><button class="go" data-a="stay">Keep going</button><button class="glass opt" data-a="end"><b style="font-size:17px">End workout</b></button></div></div>`:''}`},
 done:()=>`<div class="scr" style="justify-content:center;text-align:center"><h1>Nice work!</h1><p class="s">${DU[S.dur][2]} exercises · ${lab()}</p><button class="go" data-a="again">Go again</button><button class="glass opt" style="flex:none;height:64px;margin-top:12px;justify-content:center;border-radius:32px" data-a="home"><b style="font-size:18px">New workout</b></button></div>`
 };
 function render(){app.innerHTML=V[S.step]();ui()}
 function ui(){if(S.step!='run')return;const t=$('#tn');if(!t)return;t.textContent=Math.max(0,Math.ceil(S.left/1000));$('#rg').style.strokeDashoffset=326.7*(1-Math.max(0,S.left)/S.tot);$('#pb').style.width=((S.i+(S.ph=='w'?1-Math.max(0,S.left)/S.tot:0))/S.seq.length*100)+'%'}
 function adv(){const T=TM[S.type];if(S.ph=='r'){S.ph='w';S.tot=S.left=T[0]*1000;bp('go');vib()}else if(S.i>=S.seq.length-1){S.step='done';unlock();bp('done');setTimeout(rel,1800);return}else{S.i++;fc=0;S.ph='r';S.tot=S.left=T[1]*1000;bp('rest')}S.t=Date.now()}
+// ---- Apple Workout/Fitness export: binary .workout (protobuf wire format), layout copied from the example file
+const vi=n=>{const o=[];while(n>127){o.push(n%128|128);n=Math.floor(n/128)}o.push(n);return o},
+ ld=(f,b)=>[...vi(f*8+2),...vi(b.length),...b],vf=(f,n)=>[...vi(f*8),...vi(n)],
+ tx=(f,s)=>ld(f,[...new TextEncoder().encode(s)]),
+ db=(f,x)=>{const a=new Uint8Array(8);new DataView(a.buffer).setFloat64(0,x,true);return[...vi(f*8+1),...a]};
+const wGoal=s=>ld(1,[...vf(1,1),...ld(2,[...vf(1,1),...db(2,s)])]),
+ wStep=(s,n)=>[...wGoal(s),...(n?tx(3,n):[])],
+ wBlk=(p,s,n)=>ld(5,[...ld(1,[...vf(1,p),...ld(2,wStep(s,n))]),...vf(2,1)]);
+const nm=()=>(S.type=='strength'?{upper:'Upper Body',lower:'Lower Body',full:'Whole Body'}[S.sub]:S.type[0].toUpperCase()+S.type.slice(1))+' '+DU[S.dur][2];
+const uid=()=>{if(crypto.randomUUID)return crypto.randomUUID().toUpperCase();const r=crypto.getRandomValues(new Uint8Array(16));r[6]=r[6]&15|64;r[8]=r[8]&63|128;const x=[...r].map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase();return x.slice(0,8)+'-'+x.slice(8,12)+'-'+x.slice(12,16)+'-'+x.slice(16,20)+'-'+x.slice(20)};
+function wkFile(){
+ const T=DU[S.dur][2]*60,[w,r]=TM[S.type],ne=Math.floor((T-120+r)/(w+r)),cd=T-60-(ne*w+(ne-1)*r);
+ let b=[...vf(1,{strength:20,cardio:63,yoga:57}[S.type]),...vf(2,2),...tx(3,nm())];
+ b=b.concat(wBlk(1,60,S.type=='yoga'?'Warm-up: breathe and stretch':'Warm-up: march and reach'));
+ S.seq.slice(0,ne).forEach((x,i)=>{b=b.concat(wBlk(1,w,x.n));if(i<ne-1)b=b.concat(wBlk(2,r))});
+ b=b.concat(ld(6,wStep(cd)));
+ return new Uint8Array([...tx(9,uid()),...ld(11,b),...vf(1000,1),...vf(1002,5)])}
+function toast(m){const e=$('#ts');if(!e)return;const f=$('.fig');if(f)e.style.top=(f.offsetTop+12)+'px';else e.style.bottom='calc(110px + env(safe-area-inset-bottom,0px))';e.textContent=m;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),2800)}
+async function shr(){
+ if(!S.seq)mk();
+ const by=wkFile(),fn=nm().replace(/\s/g,'')+'.workout',f=new File([by],fn,{type:'application/octet-stream'});
+ try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:nm()});return}}catch(e){if(e&&e.name=='AbortError')return}
+ const u=URL.createObjectURL(f),a=document.createElement('a');a.href=u;a.download=fn;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000);setTimeout(()=>toast('Saved '+fn+'. Open it from Files.'),60)}
 const A={
 dur(v){S.dur=v;S.step='type'},
-type(v){S.type=v;col(CO[v]);S.step=v=='strength'?'sub':'ready'},
-sub(v){S.sub=v;S.step='ready'},
+type(v){S.type=v;col(CO[v]);S.step=v=='strength'?'sub':'ready';if(S.step=='ready')mk()},
+sub(v){S.sub=v;S.step='ready';mk()},
 back(){S.step=S.step=='ready'?(S.type=='strength'?'sub':'type'):S.step=='sub'?'type':'dur';if(S.step!='ready'&&S.step!='sub')col(C0)},
 start(){au();
- const al=S.type=='cardio'?'k':S.type=='yoga'?'y':{upper:'u',lower:'l',full:'ulc'}[S.sub],pool=E.filter(x=>al.includes(x.g)),n=DU[S.dur][2];let q=[];
- while(q.length<n){let r=sh(pool);if(q.length&&r[0]==q[q.length-1])r.push(r.shift());q=q.concat(r)}
- S.seq=q.slice(0,n);S.i=0;S.ph='r';S.tot=S.left=5000;S.pz=false;S.t=Date.now();fc=0;S.step='run';lock();bp('tick')},
-again(){A.start()},
+ S.i=0;S.ph='r';S.tot=S.left=5000;S.pz=false;S.t=Date.now();fc=0;S.step='run';lock();bp('tick')},
+again(){mk();A.start()},
 pp(){au();S.pz=!S.pz;S.t=Date.now()},
 next(){au();adv()},
+share(){shr()},
 snd(){SN=(SN+1)%3;try{localStorage.setItem('qs-sn',SN)}catch{}if(SN<2)bp('go');S.ts=['Loud · plays even in silent mode','Mixes with your music','Sound off'][SN]},
 prev(){au();if(S.ph=='w'){S.ph='r'}else if(S.i>0){S.i--;fc=0}S.tot=S.left=3000;S.t=Date.now()},
 close(){S.cf=true;S.wp=S.pz;S.pz=true},
@@ -184,7 +208,7 @@ stay(){S.cf=false;S.pz=S.wp;S.t=Date.now()},
 end(){S.cf=false;unlock();rel();S.step='dur';col(C0)},
 home(){S.step='dur';col(C0)}
 };
-document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;A[b.dataset.a](b.dataset.v);render();if(S.ts){const e=$('#ts');if(e){const f=$('.fig');if(f)e.style.top=(f.offsetTop+12)+'px';e.textContent=S.ts;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2200)}S.ts=''}});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;A[b.dataset.a](b.dataset.v);render();if(S.ts){toast(S.ts);S.ts=''}});
 setInterval(()=>{if(S.step!='run'||S.pz)return;const n=Date.now(),d=n-S.t,o=Math.ceil(S.left/1000);S.t=n;S.left-=d;const s=Math.ceil(Math.max(S.left,0)/1000);if(s!=o&&s>0&&s<=3)bp('tick');if(S.left<=0){adv();render()}else ui()},100);
 let ft=0;
 function loop(t){const d=Math.min(t-ft,100);ft=t;if(S.step=='run'){if(!S.pz)fc+=d;const el=$('#fg');if(el){const ex=S.seq[S.i],s=fig(ex,fc/1000);el.setAttribute('viewBox',ex.vb.join(' '));el.innerHTML=s}}requestAnimationFrame(loop)}
